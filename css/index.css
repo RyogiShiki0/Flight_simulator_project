@@ -36,7 +36,7 @@
       .side-bar{
         width:15%;
         background-color: rgb(104, 104, 104);
-        background-image: url('D:/pics/81471534_00.png');
+        background-image: url('../img/side_bar_background.png');
         border-left: 5px solid rgb(37, 37, 37);
         min-width: 300px;
         display: flex;
