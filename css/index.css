@@ -81,4 +81,9 @@
         background-color: rgb(37, 37, 37);
         border-top: 5px solid rgb(113, 13, 131);
         min-height: 270px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
       }

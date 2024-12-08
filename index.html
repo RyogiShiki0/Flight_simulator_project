@@ -29,8 +29,13 @@
             <div class="money">Money: <span style="color: rgb(161, 88, 184);">money</span></div>
         </div>
     </div>
-    <div class="dashboard">
-        <button onclick="fly()">fly_test</button>
+    <div class="dashboard" id="dashboard">
+        <button onclick="fly()" style="display: none;">fly_test</button>
+        <div class="welcome">
+            <h1>Welcome to Skyward deliveries!</h1>
+            <p>Please input your username:</p><input type="text" name="username" value="">
+            <button type="submit">Submit</button>
+        </div>
     </div>
     <script src="src/map.js"></script>
 </body>
