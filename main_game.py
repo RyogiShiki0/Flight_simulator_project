@@ -283,14 +283,14 @@ def submit():
         # 用户名不存在，创建新玩家
         money=600
         fuel=0
-        create_new_player(session['username'] , 600, 0)  # 假设新玩家起始钱为600，燃料为0
+        create_new_player(session['username'] , 600, 0)  
         return jsonify({"exists": False, "message": "Username created successfully!"})
 
 
 @app.route('/submit_country', methods=['POST'])
 def submit_country():
     country = request.form['country']
-    print(f"User selected country: {country}")  # 打印用户选择的国家
+    print(f"User selected country: {country}")
 
     # 查询机场列表
     sql = f"select name from airport where iso_country = (select iso_country from country where name = '{country}' and type in ('large_airport','medium_airport'))"
@@ -309,7 +309,7 @@ def submit_country():
 @app.route('/select_airport', methods=['POST'])
 def select_airport():
     airport = request.form['airport']
-    print(f"User selected airport: {airport}")  # 打印用户选择的机场
+    print(f"User selected airport: {airport}")
     money = 600
     fuel = 10
     session['airport'] = airport
@@ -343,7 +343,7 @@ def get_goods():
 def buy_item():
     data = request.get_json()
     goods_id = data.get('goods_id')
-    quantity = data.get('quantity', 1)  # 默认数量为1
+    quantity = data.get('quantity', 1)
     money = session.get('money')
     capacity = 100 + check_capacity_increase(session.get('username'))
     print(goods_id)

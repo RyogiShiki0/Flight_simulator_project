@@ -140,3 +140,15 @@
         color: rgb(250, 58, 58);
         font-size: 16px;
       }
+
+      .goods-list button,.airport-list button{
+        margin: 2px;
+        padding: 2px 7px;
+        border: 1px solid rgb(196, 103, 204);
+        outline: none;
+        border-radius: 10px;
+        font-size: 12px;
+        transition: all 50ms linear;
+        margin-left: 10px;
+      }
+      
