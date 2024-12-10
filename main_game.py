@@ -388,7 +388,7 @@ def start_flight():
 @app.route('/fly_to_airport', methods=['POST'])
 def fly_to_airport():
     airport = request.form['airport']
-    print(f"User selected airport: {airport}")  # 打印用户选择的机场
+    print(f"User selected airport: {airport}")
     session['storage'] =100
     dest_latitude, dest_longitude = get_location_by_name(airport)
     dep_latitude, dep_longitude = get_location_by_name(session['airport'])
