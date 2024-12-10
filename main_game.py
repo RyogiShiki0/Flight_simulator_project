@@ -317,6 +317,8 @@ def select_airport():
     session['fuel'] = fuel
     session['storage'] =200
     session['total_value']=0
+    session['round']=0
+    session['point']=0
     latitude, longitude = get_location_by_name(airport)
     return jsonify({"success": True,"username":session['username'], "money": session['money'], "storage":session['storage'], "fuel": session['fuel'],"airport": session['airport'],"latitude":latitude,"longitude":longitude})
 
@@ -402,6 +404,8 @@ def fly_to_airport():
         session["airport"] = airport
         session["money"]+=total_value
         session["storage"]=200
+        session['point']+=total_value
+        session['round']+=1
         return jsonify({"success": True, "message": f"You earned {total_value} money.","money": session['money'], "fuel": session['fuel'],"storage":session["storage"], "airport":session["airport"],"dest_lat":dest_latitude,"dest_long":dest_longitude,"dep_lat":dep_latitude, "dep_long":dep_longitude})
 
 
@@ -417,6 +421,16 @@ def get_location_by_name(airport_name):
 def calculate_fuel(airport_distance):
     need_fuel_point = airport_distance
     return int(need_fuel_point / 100)
+
+@app.route('/save_game', methods=['POST'])
+def save_game(): #save the game data to the database
+    sql = f"update player set money = {session["money"]}, fuel_points = {session["fuel"]}, location = '{session["airport"]}' where player_name = '{session["username"]}'"
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    print('\nGame has been saved!')
+    return jsonify({"success": True, "message": "Game has been saved!"})
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

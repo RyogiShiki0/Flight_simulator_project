@@ -213,3 +213,18 @@
       border: 3px solid rgb(211, 99, 236);
       color: rgb(142, 0, 170);
    }
+    #status-button{
+        padding: 4px 7px;
+        border: 3px solid rgb(86, 71, 90);
+        outline: none;
+        border-radius: 15px;
+        font-size: 16px;
+        transition: all 50ms linear;
+        -webkit-transition: 0.5s;
+        transition: 0.5s;
+        font-weight: 600;
+    }
+    #status-button:hover{
+      border: 3px solid rgb(211, 99, 236);
+      color: rgb(142, 0, 170);
+   }

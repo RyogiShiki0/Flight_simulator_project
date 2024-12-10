@@ -1,6 +1,6 @@
 
 document.getElementById('usernameForm').addEventListener('submit', function (e) {
-    e.preventDefault(); // 防止表单默认提交刷新页面
+    e.preventDefault(); 
 
     const username = document.getElementById('username').value;
     const messageElement = document.getElementById('message');
@@ -261,4 +261,18 @@ function startTransportMission() {
     document.getElementById('main-select-menu').style.display = 'none';
     document.getElementById('item-select-menu').style.display = 'block';
     loadGoods();
+}
+
+function saveGame(){
+    fetch('/save_game', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ total_value: 1000 }) // Example Total Value
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message)
+        }
+    });
 }
