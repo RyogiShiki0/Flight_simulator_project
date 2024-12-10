@@ -283,7 +283,7 @@ def submit():
         # 用户名不存在，创建新玩家
         money=600
         fuel=0
-        create_new_player(session['username'] , 600, 0)  
+        create_new_player(session['username'] , 600, 0)
         return jsonify({"exists": False, "message": "Username created successfully!"})
 
 
