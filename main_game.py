@@ -315,11 +315,10 @@ def select_airport():
     session['airport'] = airport
     session['money'] = money
     session['fuel'] = fuel
-    session['storage'] =100
+    session['storage'] =200
     session['total_value']=0
     latitude, longitude = get_location_by_name(airport)
-    # 这里可以根据选择的机场进行进一步的处理，例如保存用户选择的机场等
-    return jsonify({"success": True,"username":session['username'], "money": session['money'], "fuel": session['fuel'],"airport": session['airport'],"latitude":latitude,"longitude":longitude})
+    return jsonify({"success": True,"username":session['username'], "money": session['money'], "storage":session['storage'], "fuel": session['fuel'],"airport": session['airport'],"latitude":latitude,"longitude":longitude})
 
 def get_location_by_name(airport_name):
   sql= f"SELECT latitude_deg,longitude_deg FROM airport where name = '{airport_name}'"
@@ -345,7 +344,7 @@ def buy_item():
     goods_id = data.get('goods_id')
     quantity = data.get('quantity', 1)
     money = session.get('money')
-    capacity = 100 + check_capacity_increase(session.get('username'))
+    capacity = session.get("storage")
     print(goods_id)
     # 查询物品信息
     sql = f"SELECT goods_weight, goods_value FROM goods WHERE goods_id = {goods_id}"
@@ -360,9 +359,9 @@ def buy_item():
     total_weight = item['goods_weight'] * quantity
 
     if total_cost > money:
-        return jsonify({"success": False, "message": "Not enough money."})
+        return jsonify({"success": False, "message": "Not enough money.","money": session['money'], "storage": session['storage']})
     if total_weight > capacity:
-        return jsonify({"success": False, "message": "Not enough storage capacity."})
+        return jsonify({"success": False, "message": "Not enough storage capacity.","money": session['money'], "storage": session['storage']})
 
     # 更新用户数据
     session['money'] -= total_cost
@@ -403,7 +402,7 @@ def fly_to_airport():
         total_value = session['total_value'] * (1 + airport_distance / 1000)
         session["airport"] = airport
         session["money"]+=total_value
-        session["storage"]=100
+        session["storage"]=200
         return jsonify({"success": True, "message": f"You earned {total_value} money.","money": session['money'], "fuel": session['fuel'],"storage":session["storage"], "airport":session["airport"],"dest_lat":dest_latitude,"dest_long":dest_longitude,"dep_lat":dep_latitude, "dep_long":dep_longitude})
 
 

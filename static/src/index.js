@@ -5,7 +5,7 @@ document.getElementById('usernameForm').addEventListener('submit', function (e) 
     const username = document.getElementById('username').value;
     const messageElement = document.getElementById('message');
 
-    // 发送 AJAX 请求到后端
+    // Sending AJAX request to the backend
     fetch('/submit', {
         method: 'POST',
         headers: {
@@ -15,7 +15,7 @@ document.getElementById('usernameForm').addEventListener('submit', function (e) 
     })
     .then(response => response.json())
     .then(data => {
-        // 根据后端返回的结果更新页面
+        // Update the page based on the results returned by the backend
         if (data.exists) {
             messageElement.textContent = data.message;
             messageElement.style.color = 'red';
@@ -41,7 +41,7 @@ document.querySelectorAll('.country-select-menu-button').forEach(button => {
         const airportList = document.getElementById('airport-list');
 
         airportMenu.style.display = 'none';
-        airportList.innerHTML = ''; // 清空列表
+        airportList.innerHTML = ''; // Clear list
         resultMessage.textContent = '';
 
         fetch('/submit_country', {
@@ -57,12 +57,12 @@ document.querySelectorAll('.country-select-menu-button').forEach(button => {
                 resultMessage.textContent = `Airports in ${country}:`;
                 resultMessage.style.color = 'green';
 
-                // 显示机场列表并添加按钮
+                // Display the list of airports and add a button
                 data.airports.forEach(airport => {
                     const listItem = document.createElement('li');
                     listItem.textContent = airport;
 
-                    // 创建选择按钮
+                    // Creating a Select Button
                     const selectButton = document.createElement('button');
                     selectButton.textContent = "Select";
                     selectButton.addEventListener('click', function () {
@@ -97,7 +97,7 @@ document.querySelectorAll('.fly-to-country-select-menu-button').forEach(button =
         const airportList = document.getElementById('airport-list');
 
         airportMenu.style.display = 'none';
-        airportList.innerHTML = ''; // 清空列表
+        airportList.innerHTML = ''; // Clear list
         resultMessage.textContent = '';
 
         fetch('/submit_country', {
@@ -113,12 +113,12 @@ document.querySelectorAll('.fly-to-country-select-menu-button').forEach(button =
                 resultMessage.textContent = `Airports in ${country}:`;
                 resultMessage.style.color = 'green';
 
-                // 显示机场列表并添加按钮
+                // Display the list of airports and add a button
                 data.airports.forEach(airport => {
                     const listItem = document.createElement('li');
                     listItem.textContent = airport;
 
-                    // 创建选择按钮
+                    // Creating a Select Button
                     const selectButton = document.createElement('button');
                     selectButton.textContent = "Select";
                     selectButton.addEventListener('click', function () {
@@ -160,6 +160,7 @@ function dest_selectAirport(airport) {
             document.getElementById("fly-to-country-menu").style.display = "none"
             document.getElementById("airport-menu").style.display = "none"
             document.getElementById("main-select-menu").style.display = "block"
+            document.getElementById("side-bar-capacity").innerHTML = data.storage
             alert(data.message)
         }
         else{
@@ -190,6 +191,7 @@ function selectAirport(airport) {
         document.getElementById("airport-menu").style.display = "none"
         document.getElementById("main-select-menu").style.display = "block"
         document.getElementById("side-bar-username").innerHTML = data.username
+        document.getElementById("side-bar-capacity").innerHTML = data.storage
         init(data.latitude,data.longitude);
     })
     .catch(error => {
@@ -209,7 +211,7 @@ function loadGoods() {
     .then(data => {
         if (data.success) {
             const goodsList = document.querySelector('.goods-list');
-            goodsList.innerHTML = ''; // 清空列表
+            goodsList.innerHTML = ''; // Clear list
             console.log(data.goods)
             data.goods.forEach(item => {
                 const itemDiv = document.createElement('div');
@@ -233,8 +235,9 @@ function buyItem(goodsId) {
     .then(data => {
         alert(data.message);
         document.getElementById("side-bar-money").innerHTML = data.money
+        document.getElementById("side-bar-capacity").innerHTML = data.storage
         if (data.success) {
-            loadGoods(); // 重新加载物品
+            loadGoods(); // Reload Items
         }
     });
 }
@@ -242,13 +245,12 @@ function startFlight() {
     fetch('/start_flight', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ total_value: 1000 }) // 示例总价值
+        body: JSON.stringify({ total_value: 1000 }) // Example Total Value
     })
     .then(response => response.json())
     .then(data => {
         alert(data.message);
         if (data.success) {
-            // 可以跳转到下一步
             document.getElementById("side-bar-point").innerHTML = data.fuel
             document.getElementById("item-select-menu").style.display = "none"
             document.getElementById("fly-to-country-menu").style.display = "block"

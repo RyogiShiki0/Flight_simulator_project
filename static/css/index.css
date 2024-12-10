@@ -64,7 +64,7 @@
         color: white;
         font-weight: 500;
       }
-      .score, .fuel-point, .money{
+      .score, .fuel-point, .money,.capacity{
         font-size: 20px;
         color: white;
         font-weight: 500;
