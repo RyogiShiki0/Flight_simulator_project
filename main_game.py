@@ -264,7 +264,7 @@ def start_program():
 
 @app.route('/')
 def index():
-    # 数据从后端传递到HTML
+    # Data is passed from the backend to the HTML
     data = {"name": "Alice", "age": 25, "skills": ["Python", "Flask", "HTML"]}
     return render_template('index.html', data=data)
 
@@ -277,10 +277,10 @@ def submit():
     result = cursor.fetchone()
 
     if result:
-        # 用户名已存在
+        # Username already exists
         return jsonify({"exists": True, "message": "Username already exists!"})
     else:
-        # 用户名不存在，创建新玩家
+        # Username does not exist, create a new player
         money=600
         fuel=0
         create_new_player(session['username'] , 600, 0)
@@ -292,13 +292,13 @@ def submit_country():
     country = request.form['country']
     print(f"User selected country: {country}")
 
-    # 查询机场列表
+    # Check the airport list
     sql = f"select name from airport where iso_country = (select iso_country from country where name = '{country}' and type in ('large_airport','medium_airport'))"
     cursor = connection.cursor()
     cursor.execute(sql)
     result = cursor.fetchall()
 
-    # 如果找到机场，返回机场列表
+    # If an airport is found, return the airport list
     airport_list = [row[0] for row in result]
     if airport_list:
         return jsonify({"success": True, "airports": airport_list})
@@ -346,7 +346,7 @@ def buy_item():
     money = session.get('money')
     capacity = session.get("storage")
     print(goods_id)
-    # 查询物品信息
+    # Query item information
     sql = f"SELECT goods_weight, goods_value FROM goods WHERE goods_id = {goods_id}"
     cursor = connection.cursor(dictionary=True)
     cursor.execute(sql)
@@ -363,7 +363,7 @@ def buy_item():
     if total_weight > capacity:
         return jsonify({"success": False, "message": "Not enough storage capacity.","money": session['money'], "storage": session['storage']})
 
-    # 更新用户数据
+    # Update user data
     session['money'] -= total_cost
     session['total_value'] += total_cost
     session['storage'] -= total_weight
@@ -381,7 +381,6 @@ def start_flight():
     else:
         bonus = num
     session["fuel"]+=bonus
-    # 省略飞行逻辑
     return jsonify({"success": True, "message": f"Rolled the dice, the number is {num}, you got {bonus} fuel points.","fuel":session['fuel']})
 
 @app.route('/fly_to_airport', methods=['POST'])
