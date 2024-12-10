@@ -1,19 +1,21 @@
 from geopy import distance
 import random
 import mysql.connector
+from flask import Flask, render_template,request,jsonify,session
+app = Flask(__name__)
+app.secret_key = '114514'
 
 connection = mysql.connector.connect(
          host='localhost',
          port='3306',
-         database='flight_game_final',
+         database='flight_game',
          user='root',
-         password='',
+         password='114514',
          autocommit=True
          )
 
 def welcome():
     # instead of asking to start new game or load game, only ask for username and check if it's already used
-    print(" _   _               _ _        _____ _ _       _     _   \n| \ | | ___  _ __ __| (_) ___  |  ___| (_) __ _| |__ | |_ \n|  \| |/ _ \| '__/ _` | |/ __| | |_  | | |/ _` | '_ \| __|\n| |\  | (_) | | | (_| | | (__  |  _| | | | (_| | | | | |_ \n|_|_\_|\___/|_|  \__,_|_|\___| |_|   |_|_|\__, |_| |_|\__|\n/ ___|(_)_ __ ___  _   _| | __ _| |_ ___  |___/           \n\___ \| | '_ ` _ \| | | | |/ _` | __/ _ \| '__|           \n ___) | | | | | | | |_| | | (_| | || (_) | |              \n|____/|_|_| |_| |_|\__,_|_|\__,_|\__\___/|_|              ")
     print("Welcome to Nordic Flight Simulator! This beta version does not represent the final quality.")
     play_choice = input("Enter your username: ")
     return play_choice
@@ -150,7 +152,7 @@ def load_save(name):
 def start_game(money,fuel,location,name): #The main game program
     choice = input('\n[1]Start transport mission\n[2]Upgrading aircraft\n[3]Save game\n[4]Check your status\nChoose Things to Do:')
     if choice == '1':
-        money,total_value = purchase_goods(money,location,name)
+        money,total_value = 0,0
         print('The purchase of goods has been completed!')
         start_flight(money, fuel, location, name, total_value)
 
@@ -253,50 +255,133 @@ def purchase_upgrade(money,name): #get the upgrade item from the database and ch
 
     return money
 
-def purchase_goods(money,location,name): #get the available goods from the database by location
-    sql = f"select * from goods where goods_id in (select goods_id from goods_in_country where iso_country = (SELECT iso_country FROM airport where name = '{location}'))"
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute(sql)
-    result = cursor.fetchall()
-    num = 1
-    capacity = 100 + check_capacity_increase(name)
-    for i in result:
-        print(f'[{num}] {i["goods_name"]} weight:{i["goods_weight"]} value:{i["goods_value"]}\n')
-        num += 1
-    choice = 0
-    total_value = 0
-    while choice != 'q':
-        print(f'You have {money} money and and {capacity} storage spaces left.')
-        choice = input('Please select the items to purchase. Enter q to end.')
-        if choice.isnumeric() and choice != 'q':
-            choice = int(choice)
-            if 0 < choice <= len(result):
-                amount_str = input('Please enter the amount of goods:')
-                if amount_str.isnumeric():
-                    amount = int(amount_str)
-                    value = result[choice-1]['goods_value']
-                    weight = result[choice-1]['goods_weight']
-                    if amount * value > money:
-                        print("You don't have enough money!")
-                    elif amount * weight > capacity:
-                        print("You don’t have enough storage space!")
-                    else:
-                        total_value = amount * value + total_value
-                        money = money - amount * value
-                        capacity = capacity-weight*amount
-                        print(f'\nPurchase successful!\n')
-                else:
-                    print("invalid input")
-            else:
-                print("invalid input")
-        else:
-            print("invalid input")
-    return money, total_value
-
 def start_program():
     # START THE GAME, also make name global
     global name
     name = welcome()
     load_save(name)
 
-start_program()
+
+@app.route('/')
+def index():
+    # 数据从后端传递到HTML
+    data = {"name": "Alice", "age": 25, "skills": ["Python", "Flask", "HTML"]}
+    return render_template('index.html', data=data)
+
+@app.route('/submit', methods=['POST'])
+def submit():
+    session['username'] = request.form['username']
+    sql = f"SELECT * FROM player WHERE player_name = '{session['username'] }'"
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute(sql)
+    result = cursor.fetchone()
+
+    if result:
+        # 用户名已存在
+        return jsonify({"exists": True, "message": "Username already exists!"})
+    else:
+        # 用户名不存在，创建新玩家
+        money=600
+        fuel=0
+        create_new_player(session['username'] , 600, 0)  # 假设新玩家起始钱为600，燃料为0
+        return jsonify({"exists": False, "message": "Username created successfully!"})
+
+
+@app.route('/submit_country', methods=['POST'])
+def submit_country():
+    country = request.form['country']
+    print(f"User selected country: {country}")  # 打印用户选择的国家
+
+    # 查询机场列表
+    sql = f"select name from airport where iso_country = (select iso_country from country where name = '{country}' and type in ('large_airport','medium_airport'))"
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    result = cursor.fetchall()
+
+    # 如果找到机场，返回机场列表
+    airport_list = [row[0] for row in result]
+    if airport_list:
+        return jsonify({"success": True, "airports": airport_list})
+    else:
+        return jsonify({"success": False, "message": "No airports found."})
+
+
+@app.route('/select_airport', methods=['POST'])
+def select_airport():
+    airport = request.form['airport']
+    print(f"User selected airport: {airport}")  # 打印用户选择的机场
+    money = 600
+    fuel = 10
+    session['airport'] = airport
+    session['money'] = money
+    session['fuel'] = fuel
+    session['storage'] =100
+    latitude, longitude = get_location_by_name(airport)
+    # 这里可以根据选择的机场进行进一步的处理，例如保存用户选择的机场等
+    return jsonify({"success": True,"username":session['username'], "money": session['money'], "fuel": session['fuel'],"airport": session['airport'],"latitude":latitude,"longitude":longitude})
+
+def get_location_by_name(airport_name):
+  sql= f"SELECT latitude_deg,longitude_deg FROM airport where name = '{airport_name}'"
+  cursor = connection.cursor(dictionary=True)
+  cursor.execute(sql)
+  result = cursor.fetchone()
+  latitude = result['latitude_deg']
+  longitude = result['longitude_deg']
+  return latitude,longitude
+
+@app.route('/get_goods', methods=['POST'])
+def get_goods():
+    location = session.get('airport')
+    sql = f"select * from goods where goods_id in (select goods_id from goods_in_country where iso_country = (SELECT iso_country FROM airport where name = '{location}'))"
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute(sql)
+    goods = cursor.fetchall()
+    print(goods)
+    return jsonify({"success": True, "goods": goods})
+@app.route('/buy_item', methods=['POST'])
+def buy_item():
+    data = request.get_json()
+    goods_id = data.get('goods_id')
+    quantity = data.get('quantity', 1)  # 默认数量为1
+    money = session.get('money')
+    capacity = 100 + check_capacity_increase(session.get('username'))
+    print(goods_id)
+    # 查询物品信息
+    sql = f"SELECT goods_weight, goods_value FROM goods WHERE goods_id = {goods_id}"
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute(sql)
+    item = cursor.fetchone()
+
+    if not item:
+        return jsonify({"success": False, "message": "Invalid item ID."})
+
+    total_cost = item['goods_value'] * quantity
+    total_weight = item['goods_weight'] * quantity
+
+    if total_cost > money:
+        return jsonify({"success": False, "message": "Not enough money."})
+    if total_weight > capacity:
+        return jsonify({"success": False, "message": "Not enough storage capacity."})
+
+    # 更新用户数据
+    session['money'] -= total_cost
+    session['storage'] -= total_weight
+    return jsonify({"success": True, "message": "Item purchased successfully.", "money": session['money'], "storage": session['storage']})
+
+@app.route('/start_flight', methods=['POST'])
+def start_flight():
+    location = session.get('airport')
+    money = session.get('money')
+    fuel = session.get('fuel')
+    total_value = request.json.get('total_value', 0)
+    num = random.randint(1, 6)
+    if (num == 1 or num == 6):
+        bonus = 10
+    else:
+        bonus = num
+    session["fuel"]+=bonus
+    # 省略飞行逻辑
+    return jsonify({"success": True, "message": "Flight started successfully."})
+
+if __name__ == '__main__':
+    app.run(debug=True)

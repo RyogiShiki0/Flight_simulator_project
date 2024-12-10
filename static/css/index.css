@@ -88,7 +88,7 @@
         color: white;
         overflow: auto;
       }
-      .select-menu-button{
+      .main-select-menu-button{
         margin: 4px;
         padding: 5px 10px;
         border: 3px solid rgb(196, 103, 204);
@@ -128,7 +128,11 @@
       ::-webkit-scrollbar-thumb{
         background-color: white;
       }
-      .item-list{
+      .goods-list{
+        overflow: auto;
+        max-height: 150px;
+      }
+      .airport-menu{
         overflow: auto;
         max-height: 150px;
       }

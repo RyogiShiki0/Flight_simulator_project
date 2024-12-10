@@ -4,11 +4,11 @@
     // Use the 'v' parameter to indicate the version to use (weekly, beta, alpha, etc.).
     // Add other bootstrap parameters as needed, using camel case.
   });
-  async function init(value) {
+  async function init(lat_value,lng_value) {
     const { Map3DElement } = await google.maps.importLibrary("maps3d");
 
     const map = new Map3DElement({
-        center: { lat: 37.36353, lng: -121.9286, altitude: 0 },
+        center: { lat: lat_value, lng: lng_value, altitude: 0 },
         tilt: 67.5,
         range: 1000
     });    
