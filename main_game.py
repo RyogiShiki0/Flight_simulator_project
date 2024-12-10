@@ -316,6 +316,7 @@ def select_airport():
     session['money'] = money
     session['fuel'] = fuel
     session['storage'] =100
+    session['total_value']=0
     latitude, longitude = get_location_by_name(airport)
     # 这里可以根据选择的机场进行进一步的处理，例如保存用户选择的机场等
     return jsonify({"success": True,"username":session['username'], "money": session['money'], "fuel": session['fuel'],"airport": session['airport'],"latitude":latitude,"longitude":longitude})
@@ -365,6 +366,7 @@ def buy_item():
 
     # 更新用户数据
     session['money'] -= total_cost
+    session['total_value'] += total_cost
     session['storage'] -= total_weight
     return jsonify({"success": True, "message": "Item purchased successfully.", "money": session['money'], "storage": session['storage']})
 
@@ -381,7 +383,42 @@ def start_flight():
         bonus = num
     session["fuel"]+=bonus
     # 省略飞行逻辑
-    return jsonify({"success": True, "message": "Flight started successfully."})
+    return jsonify({"success": True, "message": f"Rolled the dice, the number is {num}, you got {bonus} fuel points.","fuel":session['fuel']})
+
+@app.route('/fly_to_airport', methods=['POST'])
+def fly_to_airport():
+    airport = request.form['airport']
+    print(f"User selected airport: {airport}")  # 打印用户选择的机场
+    session['storage'] =100
+    dest_latitude, dest_longitude = get_location_by_name(airport)
+    dep_latitude, dep_longitude = get_location_by_name(session['airport'])
+    departure=(dest_latitude, dest_longitude)
+    arrival=(dep_latitude, dep_longitude)
+    airport_distance = int(distance.distance(departure, arrival).km)
+    need_fuel_point = calculate_fuel(airport_distance)
+    if(need_fuel_point > session['fuel']):
+        return jsonify({"success": False, "message": "Not enough fuel points."})
+    elif(need_fuel_point <= session['fuel']):
+        session['fuel'] -= need_fuel_point
+        total_value = session['total_value'] * (1 + airport_distance / 1000)
+        session["airport"] = airport
+        session["money"]+=total_value
+        session["storage"]=100
+        return jsonify({"success": True, "message": f"You earned {total_value} money.","money": session['money'], "fuel": session['fuel'],"storage":session["storage"], "airport":session["airport"],"dest_lat":dest_latitude,"dest_long":dest_longitude,"dep_lat":dep_latitude, "dep_long":dep_longitude})
+
+
+def get_location_by_name(airport_name):
+  sql= f"SELECT latitude_deg,longitude_deg FROM airport where name = '{airport_name}'"
+  cursor = connection.cursor(dictionary=True)
+  cursor.execute(sql)
+  result = cursor.fetchone()
+  latitude = result['latitude_deg']
+  longitude = result['longitude_deg']
+  return latitude,longitude
+
+def calculate_fuel(airport_distance):
+    need_fuel_point = airport_distance
+    return int(need_fuel_point / 100)
 
 if __name__ == '__main__':
     app.run(debug=True)

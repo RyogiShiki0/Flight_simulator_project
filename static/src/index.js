@@ -87,6 +87,92 @@ document.querySelectorAll('.country-select-menu-button').forEach(button => {
     });
 });
 
+document.querySelectorAll('.fly-to-country-select-menu-button').forEach(button => {
+    button.addEventListener('click', function (event) {
+        event.preventDefault();
+
+        const country = this.getAttribute('data-country');
+        const resultMessage = document.getElementById('resultMessage');
+        const airportMenu = document.getElementById('airport-menu');
+        const airportList = document.getElementById('airport-list');
+
+        airportMenu.style.display = 'none';
+        airportList.innerHTML = ''; // 清空列表
+        resultMessage.textContent = '';
+
+        fetch('/submit_country', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({ country })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                resultMessage.textContent = `Airports in ${country}:`;
+                resultMessage.style.color = 'green';
+
+                // 显示机场列表并添加按钮
+                data.airports.forEach(airport => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = airport;
+
+                    // 创建选择按钮
+                    const selectButton = document.createElement('button');
+                    selectButton.textContent = "Select";
+                    selectButton.addEventListener('click', function () {
+                        dest_selectAirport(airport);
+                    });
+
+                    listItem.appendChild(selectButton);
+                    airportList.appendChild(listItem);
+                });
+
+                airportMenu.style.display = 'block';
+            } else {
+                resultMessage.textContent = data.message;
+                resultMessage.style.color = 'red';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            resultMessage.textContent = 'An error occurred. Please try again.';
+            resultMessage.style.color = 'red';
+        });
+    });
+});
+function dest_selectAirport(airport) {
+    fetch('/fly_to_airport', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({ airport })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success){
+            fly_to(data.dep_lat,data.dep_long,data.dest_lat,data.dest_long)
+            document.getElementById("side-bar-money").innerHTML = data.money
+            document.getElementById("side-bar-point").innerHTML = data.fuel
+            document.getElementById("side-bar-location").innerHTML = data.airport
+            document.getElementById("fly-to-country-menu").style.display = "none"
+            document.getElementById("airport-menu").style.display = "none"
+            document.getElementById("main-select-menu").style.display = "block"
+            alert(data.message)
+        }
+        else{
+            alert(data.message)
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
+}
+
+
 function selectAirport(airport) {
     fetch('/select_airport', {
         method: 'POST',
@@ -163,6 +249,9 @@ function startFlight() {
         alert(data.message);
         if (data.success) {
             // 可以跳转到下一步
+            document.getElementById("side-bar-point").innerHTML = data.fuel
+            document.getElementById("item-select-menu").style.display = "none"
+            document.getElementById("fly-to-country-menu").style.display = "block"
         }
     });
 }

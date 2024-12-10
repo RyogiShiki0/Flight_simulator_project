@@ -14,19 +14,19 @@
     });    
     document.querySelector("#map").append(map)
 }
-init();
-async function fly(value) {
+
+async function fly_to(dep_lat,dep_long,dest_lat,dest_long) {
     const { Map3DElement } = await google.maps.importLibrary("maps3d");
 
     const map = new Map3DElement({
-        center: { lat: 37.36353, lng: -121.9286, altitude: 0 },
+        center: { lat: dep_lat, lng: dep_long, altitude: 0 },
         tilt: 67.5,
         range: 1000
     });    
     document.querySelector("gmp-map-3d").replaceWith(map)
     map.flyCameraTo({
         endCamera: {
-        center: { lat: 37.6191, lng: -122.3816, altitude: 0  },
+        center: { lat: dest_lat, lng: dest_long, altitude: 0  },
         tilt: 67.5,
         range: 1000
         },
