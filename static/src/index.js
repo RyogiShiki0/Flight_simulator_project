@@ -245,7 +245,7 @@ function startFlight() {
     fetch('/start_flight', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ total_value: 1000 }) // Example Total Value
+        body: JSON.stringify({ total_value: 1000 }) 
     })
     .then(response => response.json())
     .then(data => {
@@ -267,7 +267,7 @@ function saveGame(){
     fetch('/save_game', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ total_value: 1000 }) // Example Total Value
+        body: JSON.stringify({ total_value: 1000 }) 
     })
     .then(response => response.json())
     .then(data => {
