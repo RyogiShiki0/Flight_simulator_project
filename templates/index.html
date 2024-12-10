@@ -31,7 +31,7 @@
     </div>
     <div class="dashboard" id="dashboard">
         <button onclick="fly()" style="display: none;">fly_test</button>
-        <div class="welcome" id="welcome" style="display: none;">
+        <div class="welcome" id="welcome" style="display: block;">
             <form action="/submit" method="POST" id="usernameForm">
                 <h1>Welcome to Skyward deliveries!</h1>
                 <label for="username" style="display: block;">Please input your username:</label>
@@ -40,11 +40,11 @@
             </form>
             <p id="message"></p>
         </div>
-        <div class="status" id="status" display="block">
+        <div class="status" id="status" style="display:none;">
             <h2>Hi, <span style="color: rgb(161, 88, 184);" id="status-username">username</span></h2>
             <h2>You have earned <span style="color: rgb(161, 88, 184);" id="status-money">0</span> money</h2>
             <h2>You have flown <span style="color: rgb(161, 88, 184);" id="status-round">0</span> round</h2>
-            <button id="status-button">< Back</button>
+            <button id="status-button" onclick="back_to_main()">< Back</button>
         </div>
         <div class="country-menu" id="country-menu" style="display: none;">
             <h1>Please choose your country:</h1>
@@ -76,7 +76,7 @@
             <button class="main-select-menu-button" onclick="startTransportMission()">Start transport mission</button>
             <button class="main-select-menu-button" style="display: none;">Upgrading aircraft</button>
             <button class="main-select-menu-button" onclick="saveGame()">Save game</button>
-            <button class="main-select-menu-button" data-main-selection="4">Check your status</button>
+            <button class="main-select-menu-button" onclick="checkStatus()">Check your status</button>
         </div>
         
         <div class="item-select-menu dashboard-item" id="item-select-menu" style="display: none;">

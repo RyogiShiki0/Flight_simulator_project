@@ -430,7 +430,9 @@ def save_game(): #save the game data to the database
     print('\nGame has been saved!')
     return jsonify({"success": True, "message": "Game has been saved!"})
 
-
+@app.route('/check_status', methods=['POST'])
+def check_status(): #save the game data to the database
+    return jsonify({"success": True, "point": session["point"], "round": session["round"], "username": session["username"] })
 
 if __name__ == '__main__':
     app.run(debug=True)

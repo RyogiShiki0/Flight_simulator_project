@@ -276,3 +276,26 @@ function saveGame(){
         }
     });
 }
+
+function checkStatus(){
+    fetch('/check_status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ total_value: 1000 }) // Example Total Value
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('main-select-menu').style.display="none"
+            document.getElementById('status').style.display="block"
+            document.getElementById("status-username").innerHTML= data.username
+            document.getElementById("status-money").innerHTML= data.point
+            document.getElementById("status-round").innerHTML= data.round
+        }
+    });
+}
+
+function back_to_main(){
+    document.getElementById('main-select-menu').style.display="block"
+    document.getElementById('status').style.display="none"
+}
