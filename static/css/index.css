@@ -228,3 +228,9 @@
       border: 3px solid rgb(211, 99, 236);
       color: rgb(142, 0, 170);
    }
+   .test-message{
+    position: absolute;
+    left: 10px;
+    bottom: 5px;
+    color: rgb(122, 122, 122);
+   }
